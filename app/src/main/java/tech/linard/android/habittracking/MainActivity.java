@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import tech.linard.android.habittracking.Data.HabitDBHelper;
-import tech.linard.android.habittracking.Data.HabitContract.HabitEntry;
+import tech.linard.android.habittracking.data.HabitDBHelper;
+import tech.linard.android.habittracking.data.HabitContract.HabitEntry;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,33 +18,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         insertDummyData();
-        readDummyData();
-
-
+        Cursor cursor = readDummyData();
+        displayDummyData(cursor);
     }
 
-    private void readDummyData() {
-        mDBHelper = new HabitDBHelper(this);
-        SQLiteDatabase db = mDBHelper.getReadableDatabase();
-
-        // Prepare the select statement;
-        String[] projection = {
-                HabitEntry.COLUMN_ACTION,
-                HabitEntry.COLUMN_DURATION,
-                HabitEntry.COLUMN_DATE
-        };
-
-        Cursor cursor = db.query(
-                HabitEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+    private void displayDummyData(Cursor cursor) {
         int indexAction = cursor.getColumnIndex(HabitEntry.COLUMN_ACTION);
         int indexDuration = cursor.getColumnIndex(HabitEntry.COLUMN_DURATION);
         int indexDate = cursor.getColumnIndex(HabitEntry.COLUMN_DATE);
@@ -58,13 +37,33 @@ public class MainActivity extends AppCompatActivity {
 
             txtCount.append(
                     "\n"
-                    + action + " - "
-                    + Integer.toString(duration) + " - "
-                    + date
+                            + action + " - "
+                            + Integer.toString(duration) + " - "
+                            + date
             );
         }
+    }
 
+    private Cursor readDummyData() {
+        mDBHelper = new HabitDBHelper(this);
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
+        // Prepare the select statement;
+        String[] projection = {
+                HabitEntry.COLUMN_ACTION,
+                HabitEntry.COLUMN_DURATION,
+                HabitEntry.COLUMN_DATE
+        };
+
+        return  db.query(
+                HabitEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     private void insertDummyData() {
